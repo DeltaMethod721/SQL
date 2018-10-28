@@ -1,0 +1,18 @@
+# Write your MySQL query statement below
+SELECT 
+    Request_at Day,
+    ROUND(SUM(CASE WHEN Status != 'completed' THEN 1 ELSE 0 END) / COUNT(*), 2) AS 'Cancellation Rate'
+FROM
+    (
+    SELECT 
+        Trips.*
+    FROM Trips
+    LEFT JOIN Users 
+    ON Users.Users_Id = Trips.Client_Id AND Users.Role = 'client'
+    LEFT JOIN Users t
+    ON Users.Users_Id = Trips.Driver_Id AND Users.Role = 'driver'
+    WHERE (Users.Banned != 'Yes' OR Users.Banned IS NULL) AND (t.Banned != 'Yes' OR t.Banned IS NULL) AND (DATEDIFF(Trips.Request_at, '2013-10-1') BETWEEN 0 AND 2)
+    ) tmp
+GROUP BY Day
+
+
